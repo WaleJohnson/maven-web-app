@@ -1,0 +1,91 @@
+pipeline {
+    agent any
+    tools {
+        maven 'maven3.8.8'
+    }
+    environment {
+        GITHUB_REP = 'https://github.com/WaleJohnson/maven-web-app.git'
+        DEPLOY_ENV = 'staging'
+    }
+    stages {
+        stage('Clone from Github') {
+            steps {
+                echo "cloning from Github"
+                git "${GITHUB_REP}"
+                echo "cloning done"
+            }
+        }
+        stage('Approvals') {
+            steps {
+                echo "Sending to team lead for approval to build Artifact"
+                echo "Sending email notification to team lead"
+                timeout(time: 4, unit: "DAYS") {
+                    input message: 'Approve to Build Artifact'
+                }
+            }
+        }
+        stage('Build with Maven') {
+            steps {
+                echo "Building with Maven"
+                sh 'mvn package'
+                echo "Build completed"
+            }
+        }
+        stage('Test with Sonarqube') {
+            steps {
+                echo "Testing started"
+                sh 'mvn sonar:sonar'
+                echo "Test done"
+            }
+        }
+        stage('Deploy to Nexus') {
+            steps {
+                echo "Deploying artifact to Nexus"
+                sh 'mvn deploy'
+                echo "Deploying to Nexus"
+            }
+        }
+        stage('Approvals2') {
+            steps {
+                echo "Sending to team lead for approval"
+                echo "Sending email notification to team lead"
+                timeout(time: 4, unit: "DAYS") {
+                    input message: 'Approve to deploy to staging'
+                }
+            }
+        }
+        stage('Deploy to ${DEPLOY_ENV}'){
+            steps {
+                script {
+                    if (env.DEPLOY_ENV == 'staging') {
+                        echo "Deploying to staging tomcat"
+                        deploy adapters: [tomcat9(credentialsId: 'Tomcat', path: '', url: 'http://3.94.117.84:7000/')], contextPath: null, war: 'target/*.war'
+                    } else if (env.DEPLOY_ENV == 'production') {
+                        echo "Deploying to production tomcat"
+                    }
+                }
+            }
+        }
+    }
+    post {
+        always {
+            echo "I am done"
+        }
+        success {
+            echo "Deploying to ${env.DEPLOY_ENV} successful"
+            emailext (
+                subject: "Pipeline Successful: ${currentBuild.fullDisplayName}",
+                body: "The pipeline has succeeded.",
+                to: "walejohnsonn@gmail.com"
+            )
+        }
+        failure {
+            echo "Deploying to ${env.DEPLOY_ENV} failed"
+            emailext (
+                subject: "Pipeline Failed: ${currentBuild.fullDisplayName}",
+                body: "The pipeline has failed. Please investigate.",
+                to: "walejohnsonn@gmail.com"
+            )
+        }
+    }
+}
