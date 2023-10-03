@@ -13,7 +13,7 @@ build:
 
 copy:
 	@echo "Copy to bin"
-	cp $(SOURCE-FILE) $(BIN_DIR)/
+	cp $(SOURCE-FILE) $(BIN_DIR)
 
 status:
 	@echo "Done"
