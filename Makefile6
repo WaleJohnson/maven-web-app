@@ -2,13 +2,17 @@ BIN_DIR = bin
 
 all: clean build
 
+clean:
+	@echo "Cleaning bin"
+	rm -rf $(BIN_DIR)
+
 build:
 	@echo "Building this project.."
 	mkdir $(BIN_DIR)
 
 copy:
 	@echo "Copy to bin"
-	cp /Dockerfile2 /bin
+	cp /Dockerfile2 /$(BIN_DIR)
 
-Status:
+status:
 	@echo "Done"
