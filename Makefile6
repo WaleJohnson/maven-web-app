@@ -1,4 +1,5 @@
 BIN_DIR = bin
+SOURCE_FILE = Dockerfile2
 
 all: clean build
 
@@ -12,8 +13,7 @@ build:
 
 copy:
 	@echo "Copy to bin"
-	cd maven-web-app
-	cp Dockerfile2 /$(BIN_DIR)
+	cp $(SOURCE-FILE) $(BIN_DIR)/
 
 status:
 	@echo "Done"
