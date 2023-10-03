@@ -12,7 +12,8 @@ build:
 
 copy:
 	@echo "Copy to bin"
-	cp maven-web-app/Dockerfile2 /$(BIN_DIR)
+	cd /maven-web-app
+	cp Dockerfile2 /$(BIN_DIR)
 
 status:
 	@echo "Done"
