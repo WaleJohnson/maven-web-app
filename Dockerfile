@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1
+# syntax=docker/dockerfile:1.6.0
 FROM docker
 COPY --from=docker/buildx-bin /buildx /var/lib/docker/cli-plugins/docker-buildx
 RUN docker buildx version
