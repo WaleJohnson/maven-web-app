@@ -61,7 +61,7 @@ pipeline {
                 echo "Docker Image viewing complete"
             }
         }
-        stage('Run Image and deploy to Staging Tomacat') {
+        stage('Run Image and deploy to Staging tomcat') {
             steps {
                 echo "Running docker image"
                 sh 'docker rm -f waleapp'
