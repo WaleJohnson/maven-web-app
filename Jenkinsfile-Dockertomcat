@@ -5,7 +5,7 @@ pipeline {
     }
     environment {
         GITHUB_REP = 'https://github.com/WaleJohnson/maven-web-app.git'
-        DEPLOY_ENV = 'staging'
+        DEPLOY_ENV = 'staging tomcat'
     }
     stages {
         stage('Clone from Github') {
@@ -61,7 +61,7 @@ pipeline {
                 echo "Docker Image viewing complete"
             }
         }
-        stage('Run Image and deploy to tomcat') {
+        stage('Run Image and deploy to ${env.DEPLOY_ENV}') {
             steps {
                 echo "Running docker image"
                 sh 'docker rm -f waleapp'
@@ -77,16 +77,18 @@ pipeline {
         }
         success {
             echo "Deploying to ${env.DEPLOY_ENV} successful"
-            slackSend (
-                color: 'good', // 'good' for success, 'danger' for failure
-                message: "Pipeline Successful: ${currentBuild.fullDisplayName}\nDeployed to ${env.DEPLOY_ENV} successfully.",
+            emailext (
+                subject: "Pipeline Successful: ${currentBuild.fullDisplayName}",
+                body: "The pipeline has succeeded.",
+                to: "walejohnsonn@gmail.com"
             )
         }
         failure {
             echo "Deploying to ${env.DEPLOY_ENV} failed"
-            slackSend (
-                color: 'danger', // 'good' for success, 'danger' for failure
-                message: "Pipeline Failed: ${currentBuild.fullDisplayName}\nDeploy to ${env.DEPLOY_ENV} failed. Please investigate.",
+            emailext (
+                subject: "Pipeline Failed: ${currentBuild.fullDisplayName}",
+                body: "The pipeline has failed. Please investigate.",
+                to: "walejohnsonn@gmail.com"
             )
         }
     }
